@@ -9,29 +9,30 @@ class Application(tk.Tk):
 	changesMade = False # Boolean for saving config file
 	count=0 # Number of Config Key, Valued Pairs
 	configData={} # Dictionary of Original Config Items
-	DetailsPage_labels = []; DetailsPage_entries = []; EditPage_entries = []; 
+	DetailsPage_entries = []; DetailsPage_labels = []; # All read-only widgets
+	EditPage_entries = []; EditPage_labels = []; # All editable widgets
 	errorLog = [] # Errors encountered by GUI
 	firstEdit = True # Edited check, to load changed data
 	labelsGone = False # Labels Deleted from DetailsPage
 	keyOrder = [] # Order of Dictionary Key Elements
 	sortedData = {} # Dictionary of Config Items, saved by user
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
+
 	def __init__(self,*args,**kwargs):
 		tk.Tk.__init__(self,*args,**kwargs)
 		tk.Tk.wm_title(self,"Harness Interface")
 		self.container = tk.Frame(self)
 		self.container.pack(side="top", fill="both", expand=True)
-		self.container.grid_rowconfigure(0,weight=1)
-		self.container.grid_columnconfigure(0,weight=1)
+		self.container.grid_rowconfigure(0,weight=1); self.container.grid_columnconfigure(0,weight=1)
 		self.frames = {}; self.gather_StatusPage_checks() # Fill Status Page dictionary
 		for F in (StartPage, DetailsPage, EditConfigsPage, StatusCheckPage):
-			frame = F(self.container,self) # Create frame
-			self.frames[F] = frame # Store frame
-			frame.grid(row=0, column=0, sticky="nsew") 
+			frame = F(self.container,self); self.frames[F] = frame; frame.grid(row=0, column=0, sticky="nsew") # Create, store, grid
 		self.show_frame(StartPage) # Show Home
+
 	def gather_StatusPage_checks(self):
 		for I in ["Configuration Settings Loaded","Configuration Settings Set","Harness Script Run"]:
 			Application.StatusPage_checks[I] = "PASS"
+
 	def show_frame(self, cont):
 		for frame in self.frames.values():
 			frame.grid_remove()
@@ -64,8 +65,7 @@ def runscript_callback(controller):
 		noerror = True
 	except subprocess.CalledProcessError as e:
 		noerror = False
-		Application.errorLog.append(e.output)
-		Application.StatusPage_checks["Harness Script Run"] = "FAIL"
+		Application.errorLog.append(e.output); Application.StatusPage_checks["Harness Script Run"] = "FAIL";
 	if (noerror):
 		subprocess.call('Scripts/Bash/runFile.sh', shell=True) # Script accomplishes both Harness build &run 
 		Application.StatusPage_checks["Harness Script Run"] = "PASS"
@@ -197,11 +197,13 @@ class EditConfigsPage(tk.Frame):
 		for key in Application.keyOrder:
 			if i>4:
 				i = 1; j = j+1; # Column limit exceeded, begin new row
-			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":").grid(column=i, row=j)
+			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":")
+			Application.EditPage_labels.append(labelName)
+			labelName.grid(column=i, row=j)
 			fieldName = tk.Entry(self); fieldName.insert(5,Application.configData[key]); # Create entry, add data
 			fieldName.grid(column=i+2, row=j)
-			i = i+3 # Increment (chosen spacing)
 			Application.EditPage_entries.append(fieldName) # Store Entry widgets in a list
+			i = i+3 # Column for Second label/entry pair
 		Application.firstEdit = False # Config settings have been edited
 		pad_children(self) # Assign padding to child widgets
 
