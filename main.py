@@ -86,9 +86,21 @@ def window_asktocancel(pageName,controller):
 def window_popup(title,message):
    tk.messagebox.showinfo(title, message)
 
+def window_callwait(message,self):
+    win = window_loadwait(message,self)
+    self.after(2000, win.destroy)
+
+def window_loadwait(message,self):
+	win = tk.Toplevel(self)
+	win.transient()
+	win.title("")
+	label = tk.Label(win, bg = "green", fg = "white", font = "Helvetica 12", text=message)
+	label.grid(row=0, column=0,columnspan=3)
+	label.grid_configure(padx=10, pady=10)
+	return win
+
 # Config Data Functions
 def load_configdata():
-	# Parsing Log Info for Config Edits
 	inputdata = {}
 	if (Application.firstEdit or not Application.changesMade):
 		with open('Logs/harness_log.txt') as f:
@@ -133,6 +145,7 @@ def save_configdata(self,controller): # Gather Entry Data, if changed then Outpu
 	if (Application.changesMade):
 		write_configdata("Save")
 		remove_configitems()
+		window_callwait("Changes saved",self)
 	controller.show_frame(DetailsPage) # Returns to read-only config settings page
 
 def write_configdata(method):
@@ -179,7 +192,7 @@ class DetailsPage(tk.Frame):
 				i = 1 # column limit exceeded, begin new line
 				j = j+1 # new row
 			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":")
-			Application.DetailsPage_labels.append(labelName) # Store Label widgets in a list, see remove_configItems() function
+			Application.DetailsPage_labels.append(labelName) # Store Label widgets in a list, see remove_configitems() function
 			labelName.grid(column=i, row=j)
 			fieldName = tk.Entry(self)
 			fieldName.insert(5,inputdata[key])
