@@ -7,6 +7,6 @@ The Harness GUI is built using Python3 and tkinter. The user must have both inst
 
 ## Main Features
 - Configuration settings loaded automatically
-- Configuration settings editable
-- Java Program for Harness can be run from GUI itself
-- Error checks on the Status Check window
+- Configuration settings can be changed by user
+- Java Program for Harness is run from GUI itself
+- Error checks for shell scripts on the Status Check window
