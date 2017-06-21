@@ -7,9 +7,9 @@ LARGE_FONT = ("Verdana", 18)
 # App
 class Application(tk.Tk):
 	changesMade = False # Boolean for saving config file
-	count=0 #Number of Config Key, Valued Pairs
-	d={} # Dictionary of Config Items, read-in from log
-	DetailsPage_labels = []; Edit_fieldEntries = []; # All labels, editable config settings
+	count=0 # Number of Config Key, Valued Pairs
+	d={} # Dictionary of Original Config Items
+	DetailsPage_labels = []; EditPage_entries = []; # All labels, editable config settings
 	errorLog = [] # Errors encountered by GUI
 	firstEdit = True # Edited check, to load changed data
 	labelsGone = False # Labels Deleted from DetailsPage
@@ -94,7 +94,7 @@ def window_loadwait(message,self):
 	win = tk.Toplevel(self)
 	win.transient()
 	win.title("")
-	label = tk.Label(win, bg = "green", fg = "white", font = "Helvetica 12", text=message)
+	label = tk.Label(win, font = "Helvetica 12", text=message)
 	label.grid(row=0, column=0,columnspan=3)
 	label.grid_configure(padx=10, pady=10)
 	return win
@@ -137,7 +137,7 @@ def remove_configitems():
 def save_configdata(self,controller): # Gather Entry Data, if changed then Output new values
 	num=0 # Incrementer
 	for key in Application.orderKeys:
-		Application.sortedData[key] = Application.Edit_fieldEntries[num].get() # Each key changed, gets its new value
+		Application.sortedData[key] = Application.EditPage_entries[num].get() # Each key changed, gets its new value
 		num = num+1
 		if Application.d[key] != Application.sortedData[key]:
 			Application.numEdits = Application.numEdits + 1
@@ -145,7 +145,7 @@ def save_configdata(self,controller): # Gather Entry Data, if changed then Outpu
 	if (Application.changesMade):
 		write_configdata("Save")
 		remove_configitems()
-		window_callwait("Changes saved",self)
+		window_callwait("Changes saved!",self)
 	controller.show_frame(DetailsPage) # Returns to read-only config settings page
 
 def write_configdata(method):
@@ -221,7 +221,7 @@ class EditConfigsPage(tk.Frame):
 			fieldName.insert(5,Application.d[key])
 			fieldName.grid(column=i+2, row=j)
 			i = i+3 # Increment (chosen spacing)
-			Application.Edit_fieldEntries.append(fieldName) # Store Entry widgets in a list
+			Application.EditPage_entries.append(fieldName) # Store Entry widgets in a list
 		Application.firstEdit = False # Config settings have been edited
 		pad_children(self) # Assign padding to child widgets
 
