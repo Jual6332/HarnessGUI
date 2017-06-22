@@ -15,6 +15,7 @@ class Application(tk.Tk):
 	firstEdit = True # Edited check, to load changed data
 	labelsGone = False # Labels Deleted from DetailsPage
 	keyOrder = [] # Order of Dictionary Key Elements
+	script_name = "runzFile.sh"; # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
 
@@ -59,15 +60,16 @@ def pad_children(self):
 		child.grid_configure(padx=5, pady=5)
 
 def runscript_callback(controller):
-	noerror = False;
+	noerror = False; 
 	try:
-		subprocess.check_output('Scripts/Bash/runFile.sh',stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+		subprocess.check_output('Scripts/Bash/'+Application.script_name,stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
 		noerror = True
 	except subprocess.CalledProcessError as e:
 		noerror = False
+		if "not found" in e.output and "Scripts/Bash/" in e.output: e.output="Script file '" + Application.script_name+ "'' not found";
 		Application.errorLog.append(e.output); Application.StatusPage_checks["Harness Script Run"] = "FAIL";
 	if (noerror):
-		subprocess.call('Scripts/Bash/runFile.sh', shell=True) # Script accomplishes both Harness build &run 
+		subprocess.call('Scripts/Bash/'+Application.script_name, shell=True) # Script accomplishes both Harness build &run 
 		Application.StatusPage_checks["Harness Script Run"] = "PASS"
 	controller.show_frame(StatusCheckPage)
 
@@ -129,12 +131,12 @@ def save_configdata(self,controller): # Gather Entry Data, if changed then Outpu
 	num=0; check = True
 	for key in Application.keyOrder:
 		Application.sortedData[key] = Application.EditPage_entries[num].get() # Each key changed, gets its new value
-		if key == "forecast" and not Application.sortedData[key].isalpha():
+		if key == "forecast" and (not Application.sortedData[key].isalpha()):
 			check = False
-			window_popup("Error","Item forecast must contain only letters")
+			window_popup("Error","Item 'forecast' must contain only letters")
 		elif key != "forecast" and (not Application.sortedData[key].isnumeric()):
 			check = False
-			window_popup("Error","Item "+key+" must contain only numbers")
+			window_popup("Error","Item '"+key+"' must contain only numbers")
 		else:
 			if Application.configData[key] != Application.sortedData[key]:
 				Application.changesMade = True

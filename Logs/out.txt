@@ -1,7 +1,7 @@
-forecast: yes
-forecastMin: 13
+forecast: no
+forecastMin: 89
 cshPeriod: 14
-cshLockout: 15p
+cshLockout: 15
 tpPeriod: 16
 visPeriod: 17
 statusPeriod: 18
