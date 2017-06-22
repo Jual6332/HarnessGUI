@@ -61,7 +61,7 @@ def pad_children(self):
 def runscript_callback(controller):
 	noerror = False;
 	try:
-		subprocess.check_output('Scripts/Bash/runFile.sh',stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+		subprocess.check_output('Scripts/Bash/runhFile.sh',stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
 		noerror = True
 	except subprocess.CalledProcessError as e:
 		noerror = False
@@ -71,8 +71,12 @@ def runscript_callback(controller):
 		Application.StatusPage_checks["Harness Script Run"] = "PASS"
 	controller.show_frame(StatusCheckPage)
 
-def window_asktocancel(pageName,controller):
-	if messagebox.askokcancel("Quit", "Harness is running. Are you sure you want to quit?"):
+def window_asktocancel(pageName,controller,errorQuery):
+	if not errorQuery:
+		if messagebox.askokcancel("Quit", "Harness is running. Are you sure you want to quit?"):
+			if pageName == "Home": controller.show_frame(StartPage)
+			elif pageName == "Quit": close_app()
+	else:
 		if pageName == "Home": controller.show_frame(StartPage)
 		elif pageName == "Quit": close_app()
 
@@ -212,8 +216,12 @@ class StatusCheckPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: window_asktocancel("Home",controller)).grid(row=5,column=4,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command=lambda: window_asktocancel("Quit",controller)).grid(row=5,column=5,rowspan=1)
+		error = False
+		for key in sorted(Application.StatusPage_checks):
+			if Application.StatusPage_checks[key] == "FAIL":
+				error=True
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: window_asktocancel("Home",controller,error)).grid(row=5,column=4,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command=lambda: window_asktocancel("Quit",controller,error)).grid(row=5,column=5,rowspan=1)
 		self.load_progress(controller)
 	def load_progress(self, controller):
 		i=1;j=2; # Column and row incrementers
