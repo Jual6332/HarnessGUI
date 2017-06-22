@@ -41,7 +41,7 @@ class Application(tk.Tk):
 			del frame
 			frame = DetailsPage(self.container,self)
 			self.frames[DetailsPage] = frame
-		elif cont.__name__ == "StatusCheckPage":
+		elif cont.__name__ == "StatusCheckPage": # Make for loop with these two pages being deleted, added
 			del frame
 			frame = StatusCheckPage(self.container,self)
 			self.frames[StatusCheckPage] = frame
@@ -61,7 +61,7 @@ def pad_children(self):
 def runscript_callback(controller):
 	noerror = False;
 	try:
-		subprocess.check_output('Scripts/Bash/runhFile.sh',stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+		subprocess.check_output('Scripts/Bash/runFile.sh',stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
 		noerror = True
 	except subprocess.CalledProcessError as e:
 		noerror = False
@@ -95,7 +95,7 @@ def window_loadwait(message,self):
 # Config Data Functions
 def load_configdata():
 	inputdata = {}
-	if (Application.firstEdit or not Application.changesMade):
+	if (Application.firstEdit or not Application.changesMade): # Better way: Simplify to one with statement!!!!
 		with open('Logs/harness_log.txt') as f:
 			data = f.readlines()
 			for item in data:
@@ -126,15 +126,23 @@ def remove_configitems():
 		Application.labelsGone = True
 
 def save_configdata(self,controller): # Gather Entry Data, if changed then Output new values
-	num=0 # Incrementer
+	num=0; check = True
 	for key in Application.keyOrder:
 		Application.sortedData[key] = Application.EditPage_entries[num].get() # Each key changed, gets its new value
+		if key == "forecast" and not Application.sortedData[key].isalpha():
+			check = False
+			window_popup("Error","Item forecast must contain only letters")
+		elif key != "forecast" and (not Application.sortedData[key].isnumeric()):
+			check = False
+			window_popup("Error","Item "+key+" must contain only numbers")
+		else:
+			if Application.configData[key] != Application.sortedData[key]:
+				Application.changesMade = True
 		num = num+1
-		if Application.configData[key] != Application.sortedData[key]:
-			Application.changesMade = True
-	if (Application.changesMade):
-		write_configdata("Save"); remove_configitems(); window_callwait("Changes saved!",self); # Save data, clear DetailsPage, display Saved changed prompt
-	controller.show_frame(DetailsPage) # Returns to read-only config settings page
+	if check: # Save changes to CIs
+		if (Application.changesMade):
+			write_configdata("Save"); remove_configitems(); window_callwait("Changes saved!",self); # Save data, clear DetailsPage, display Saved changed prompt
+		controller.show_frame(DetailsPage) # Returns to read-only config settings page
 
 def write_configdata(method):
 	num = 1 # printing incrementally
@@ -144,7 +152,6 @@ def write_configdata(method):
 	else:
 		config = open('Logs/out.txt', 'w')
 		check_dict = Application.sortedData
-
 	for key in Application.keyOrder:
 		if num != Application.count: # Simplify newline!
 			config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
@@ -164,17 +171,10 @@ class StartPage(tk.Frame):
 		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command = close_app).grid(row=5,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
-class DetailsPage(tk.Frame):
-	def __init__(self,parent,controller):
-		initialize_class(self,parent,controller)
-	def set_page(self,controller):
-		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=7,rowspan=1)
-		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 12", text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=6,column=6,rowspan=1)
-		self.display_configs()
-	def display_configs(self): # Display Configuration Settings (Harness Log), 2 per row
+def display_ClassConfigs(name,self):
+	i=1;j=2; # Column and row incrementers
+	if name == "DetailsPage":
 		inputdata = load_configdata(); # Load Data
-		i=1;j=2; # Column and row incrementers
 		for key in Application.keyOrder:
 			if i>4:
 				i = 1; j = j+1; # Column limit exceeded, begin new row
@@ -186,18 +186,7 @@ class DetailsPage(tk.Frame):
 			fieldName.configure(state="readonly") # Readonly for viewing purposes
 			Application.DetailsPage_entries.append(fieldName) # Store Label widgets in a list
 			i = i+3 # Column for Second label/entry pair
-		pad_children(self) # Assign padding to child widgets
-
-class EditConfigsPage(tk.Frame):
-	def __init__(self,parent,controller):
-		initialize_class(self,parent,controller)
-	def set_page(self,controller):
-		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = "Helvetica 12", text="Save",command=lambda: save_configdata(self,controller)).grid(row=6,column=6,rowspan=1)
-		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=6,column=7,rowspan=1)
-		self.display_configs()
-	def display_configs(self):
-		i=1;j=2; # Column and row incrementers
+	else:
 		for key in Application.keyOrder:
 			if i>4:
 				i = 1; j = j+1; # Column limit exceeded, begin new row
@@ -209,7 +198,25 @@ class EditConfigsPage(tk.Frame):
 			Application.EditPage_entries.append(fieldName) # Store Entry widgets in a list
 			i = i+3 # Column for Second label/entry pair
 		Application.firstEdit = False # Config settings have been edited
-		pad_children(self) # Assign padding to child widgets
+	pad_children(self) # Assign padding to child widgets
+
+class DetailsPage(tk.Frame):
+	def __init__(self,parent,controller):
+		initialize_class(self,parent,controller)
+	def set_page(self,controller):
+		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=7,rowspan=1)
+		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 12", text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=6,column=6,rowspan=1)
+		display_ClassConfigs("DetailsPage",self)
+
+class EditConfigsPage(tk.Frame):
+	def __init__(self,parent,controller):
+		initialize_class(self,parent,controller)
+	def set_page(self,controller):
+		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
+		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = "Helvetica 12", text="Save",command=lambda: save_configdata(self,controller)).grid(row=6,column=6,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=6,column=7,rowspan=1)
+		display_ClassConfigs("EditConfigsPage",self)
 
 class StatusCheckPage(tk.Frame):
 	def __init__(self,parent,controller):
