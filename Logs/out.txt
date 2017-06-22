@@ -1,5 +1,5 @@
-forecast: no
-forecastMin: 89
+forecast: maybe
+forecastMin: 13
 cshPeriod: 14
 cshLockout: 15
 tpPeriod: 16
