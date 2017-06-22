@@ -14,7 +14,7 @@ class Application(tk.Tk):
 	errorLog = [] # Errors encountered by GUI
 	firstEdit = True # Edited check, to load changed data
 	labelsGone = False # Labels Deleted from DetailsPage
-	keyOrder = [] # Order of Dictionary Key Elements
+	key_order = [] # Order of Dictionary Key Elements
 	script_name = "runzFile.sh"; # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
@@ -66,7 +66,7 @@ def runscript_callback(controller):
 		noerror = True
 	except subprocess.CalledProcessError as e:
 		noerror = False
-		if "not found" in e.output and "Scripts/Bash/" in e.output: e.output="Script file '" + Application.script_name+ "'' not found";
+		if "not found" in e.output and "Scripts/Bash/" in e.output: e.output="Script file '" + Application.script_name+ "' not found";
 		Application.errorLog.append(e.output); Application.StatusPage_checks["Harness Script Run"] = "FAIL";
 	if (noerror):
 		subprocess.call('Scripts/Bash/'+Application.script_name, shell=True) # Script accomplishes both Harness build &run 
@@ -89,7 +89,7 @@ def window_callwait(message,self):
     win = window_loadwait(message,self); self.after(2000, win.destroy);
 
 def window_loadwait(message,self):
-	win = tk.Toplevel(self); win.transient(); win.title("")
+	win = tk.Toplevel(self); win.transient(); win.title("");
 	label = tk.Label(win, font = "Helvetica 12", text=message)
 	label.grid(row=0, column=0,columnspan=3); label.grid_configure(padx=10, pady=10);
 	return win
@@ -107,7 +107,7 @@ def load_configdata():
 				Application.configData[splice[0]] = no_space[1]
 				Application.count = Application.count+1
 				inputdata = Application.configData
-				Application.keyOrder.append(splice[0])
+				Application.key_order.append(splice[0])
 		write_configdata("Backup")
 	else: # If changes have been made, load output file
 		with open('Logs/out.txt') as f:
@@ -128,23 +128,23 @@ def remove_configitems():
 		Application.labelsGone = True
 
 def save_configdata(self,controller): # Gather Entry Data, if changed then Output new values
-	num=0; check = True
-	for key in Application.keyOrder:
+	num=0; check = True; errorMsg = "Errors:\n------------\n";
+	for key in Application.key_order:
 		Application.sortedData[key] = Application.EditPage_entries[num].get() # Each key changed, gets its new value
 		if key == "forecast" and (not Application.sortedData[key].isalpha()):
-			check = False
-			window_popup("Error","Item 'forecast' must contain only letters")
+			check = False; errorMsg = errorMsg + "- Item 'forecast' must contain only letters\n";
 		elif key != "forecast" and (not Application.sortedData[key].isnumeric()):
-			check = False
-			window_popup("Error","Item '"+key+"' must contain only numbers")
+			check = False; errorMsg = errorMsg + "- Item '"+key+"' must contain only numbers\n";
 		else:
 			if Application.configData[key] != Application.sortedData[key]:
 				Application.changesMade = True
 		num = num+1
 	if check: # Save changes to CIs
 		if (Application.changesMade):
-			write_configdata("Save"); remove_configitems(); window_callwait("Changes saved!",self); # Save data, clear DetailsPage, display Saved changed prompt
+			write_configdata("Save"); remove_configitems(); window_callwait("Saving changes!",self); # Save data, clear DetailsPage, display Saved changed prompt
 		controller.show_frame(DetailsPage) # Returns to read-only config settings page
+	else:
+		window_popup("Save Failed",errorMsg)
 
 def write_configdata(method):
 	num = 1 # printing incrementally
@@ -154,7 +154,7 @@ def write_configdata(method):
 	else:
 		config = open('Logs/out.txt', 'w')
 		check_dict = Application.sortedData
-	for key in Application.keyOrder:
+	for key in Application.key_order:
 		if num != Application.count: # Simplify newline!
 			config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
 		else:
@@ -177,19 +177,18 @@ def display_ClassConfigs(name,self):
 	i=1;j=2; # Column and row incrementers
 	if name == "DetailsPage":
 		inputdata = load_configdata(); # Load Data
-		for key in Application.keyOrder:
+		for key in Application.key_order:
 			if i>4:
 				i = 1; j = j+1; # Column limit exceeded, begin new row
 			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":")
-			Application.DetailsPage_labels.append(labelName) # Store Label widgets in a list, see remove_configitems() function
+			Application.DetailsPage_labels.append(labelName)
 			labelName.grid(column=i, row=j)
 			fieldName = tk.Entry(self); fieldName.insert(5,inputdata[key]); # Create entry, add data
-			fieldName.grid(column=i+2, row=j) # Placed next to Config setting label
-			fieldName.configure(state="readonly") # Readonly for viewing purposes
+			fieldName.grid(column=i+2, row=j); fieldName.configure(state="readonly") 
 			Application.DetailsPage_entries.append(fieldName) # Store Label widgets in a list
 			i = i+3 # Column for Second label/entry pair
 	else:
-		for key in Application.keyOrder:
+		for key in Application.key_order:
 			if i>4:
 				i = 1; j = j+1; # Column limit exceeded, begin new row
 			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":")
@@ -226,11 +225,9 @@ class StatusCheckPage(tk.Frame):
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
 		error = False
-		for key in sorted(Application.StatusPage_checks):
-			if Application.StatusPage_checks[key] == "FAIL":
-				error=True
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: window_asktocancel("Home",controller,error)).grid(row=5,column=4,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command=lambda: window_asktocancel("Quit",controller,error)).grid(row=5,column=5,rowspan=1)
+		if len(Application.errorLog)>0: error=True
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: window_asktocancel("Home",controller,error)).grid(row=6,column=4,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command=lambda: window_asktocancel("Quit",controller,error)).grid(row=6,column=5,rowspan=1)
 		self.load_progress(controller)
 	def load_progress(self, controller):
 		i=1;j=2; # Column and row incrementers
