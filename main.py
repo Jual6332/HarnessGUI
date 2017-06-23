@@ -1,8 +1,9 @@
 import tkinter as tk
+import math
 import subprocess
 from tkinter import messagebox
 
-LARGE_FONT = ("Verdana", 18)
+SMALL_FONT = "Helvetica 10"; NORMAL_FONT = "Helvetica 12"; LARGE_FONT = "Verdana 18";
 
 # App
 class Application(tk.Tk):
@@ -29,7 +30,7 @@ class Application(tk.Tk):
 		self.show_frame(StartPage) # Show Home
 
 	def gather_StatusPage_checks(self):
-		for I in ["Configuration Settings Loaded","Configuration Settings Set","Harness Script Run"]: Application.StatusPage_checks[I] = "PASS"
+		for I in ["Configuration Settings Loaded","Configuration Settings Set","Harness Script Run"]: Application.StatusPage_checks[I] = "PASS";
 
 	def show_frame(self, cont):
 		for frame in self.frames.values(): frame.grid_remove()
@@ -82,7 +83,7 @@ def window_callwait(message,self):
 
 def window_loadwait(message,self):
 	win = tk.Toplevel(self); win.transient(); win.title("");
-	label = tk.Label(win, font = "Helvetica 12", text=message); label.grid(row=0, column=0,columnspan=3); label.grid_configure(padx=10, pady=10);
+	label = tk.Label(win, font = NORMAL_FONT, text=message); label.grid(row=0, column=0,columnspan=3); label.grid_configure(padx=10, pady=10);
 	return win
 
 # Config Data Functions
@@ -90,7 +91,7 @@ def load_configdata():
 	inputdata = {};
 	if (Application.firstEdit or not Application.changesMade): # Better way: Simplify to one with statement!!!!
 		with open('Logs/harness_log.txt') as f:
-			data = f.readlines()
+			Application.key_order = []; data = f.readlines();
 			for item in data:
 				splice = item.split(":"); no_newline = splice[1].split("\n"); no_space = no_newline[0].split(" ");
 				Application.configData[splice[0]] = no_space[1]; Application.count = Application.count+1;
@@ -127,8 +128,7 @@ def save_configdata(self,controller): # Gather Entry Data, if changed then Outpu
 		if (Application.changesMade):
 			write_configdata("Save"); remove_configitems(); window_callwait("Saving changes!",self); # Save data, clear DetailsPage, display Saved changed prompt
 		controller.show_frame(DetailsPage) # Returns to read-only config settings page
-	else:
-		window_popup("Save Failed",errorMsg)
+	else: window_popup("Save Failed",errorMsg)
 
 def write_configdata(method):
 	num = 1 # printing incrementally
@@ -150,9 +150,9 @@ class StartPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Harness Interface\n").grid(row=0, column=1,columnspan=3)
-		runbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = "Helvetica 12", text = "Run Harness",command=lambda: runscript_callback(controller)).grid(row=5,column=0,rowspan=1)
-		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 12", text="View Configs",command=lambda: controller.show_frame(DetailsPage)).grid(row=4,column=0,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command = close_app).grid(row=5,column=4,rowspan=1)
+		runbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text = "Run Harness",command=lambda: runscript_callback(controller)).grid(row=5,column=0,rowspan=1)
+		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="View Configs",command=lambda: controller.show_frame(DetailsPage)).grid(row=4,column=0,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command = close_app).grid(row=5,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
 def display_ClassConfigs(name,self):
@@ -161,7 +161,7 @@ def display_ClassConfigs(name,self):
 		inputdata = load_configdata(); # Load Data
 		for key in Application.key_order:
 			if i>4:	i = 1; j = j+1; # Column limit exceeded, begin new row
-			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":"); labelName.grid(column=i, row=j);
+			labelName = tk.Label(self,font = NORMAL_FONT,text=key + ":"); labelName.grid(column=i, row=j);
 			fieldName = tk.Entry(self); fieldName.grid(column=i+2, row=j);
 			fieldName.insert(5,inputdata[key]);	fieldName.configure(state="readonly");
 			Application.DetailsPage_entries.append(fieldName); Application.DetailsPage_labels.append(labelName); # Store widgets 
@@ -169,7 +169,7 @@ def display_ClassConfigs(name,self):
 	else:
 		for key in Application.key_order:
 			if i>4: i = 1; j = j+1; # Column limit exceeded, begin new row
-			labelName = tk.Label(self,font = "Helvetica 12",text=key + ":"); labelName.grid(column=i, row=j);
+			labelName = tk.Label(self,font = NORMAL_FONT,text=key + ":"); labelName.grid(column=i, row=j);
 			fieldName = tk.Entry(self); fieldName.grid(column=i+2, row=j);
 			fieldName.insert(5,Application.configData[key]); # Create entry, add data
 			Application.EditPage_entries.append(fieldName); Application.EditPage_labels.append(labelName); # Store widgets
@@ -181,9 +181,10 @@ class DetailsPage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
+		inputdata = load_configdata()
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=7,rowspan=1)
-		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 12", text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=6,column=6,rowspan=1)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=7,rowspan=1)
+		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=6,rowspan=1)
 		display_ClassConfigs("DetailsPage",self)
 
 class EditConfigsPage(tk.Frame):
@@ -191,8 +192,8 @@ class EditConfigsPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = "Helvetica 12", text="Save",command=lambda: save_configdata(self,controller)).grid(row=6,column=6,rowspan=1)
-		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=6,column=7,rowspan=1)
+		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=6,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=7,rowspan=1)
 		display_ClassConfigs("EditConfigsPage",self)
 
 class StatusCheckPage(tk.Frame):
@@ -200,16 +201,16 @@ class StatusCheckPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
-		error = False
+		error = False; 
 		if len(Application.errorLog)>0: error=True;
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = "Helvetica 12", text="Home",command=lambda: window_asktocancel("Home",controller,error)).grid(row=6,column=4,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = "Helvetica 12", text ="Close", command=lambda: window_asktocancel("Quit",controller,error)).grid(row=6,column=5,rowspan=1)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: window_asktocancel("Home",controller,error)).grid(row=6,column=4,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=lambda: window_asktocancel("Quit",controller,error)).grid(row=6,column=5,rowspan=1)
 		self.load_progress(controller)
 	def load_progress(self, controller):
 		i=1;j=2; # Column and row incrementers
 		for key in sorted(Application.StatusPage_checks):
-			labelName = tk.Label(self,font = "Helvetica 12",text= key + "  ").grid(column=i, row=j)
-			labelSecond = tk.Label(self, font = "Helvetica 10",text=Application.StatusPage_checks[key], fg = "white")
+			labelName = tk.Label(self,font = NORMAL_FONT,text= key + "  ").grid(column=i, row=j)
+			labelSecond = tk.Label(self, font = SMALL_FONT,text=Application.StatusPage_checks[key], fg = "white")
 			if Application.StatusPage_checks[key] == "PASS": labelSecond.configure(bg = "Green");
 			else: 
 				labelSecond.configure(bg = "Red"); logbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 9", text ="See Log", command = lambda: window_popup("Error Log",Application.errorLog[0])).grid(row=4,column=4,rowspan=1)
