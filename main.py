@@ -165,27 +165,32 @@ class StartPage(tk.Frame):
 
 def display_ClassConfigs(name,self):
 	i=1;j=2; # Column and row incrementers
+	sty = Style(self); sty.configure("TSeparator", background="blue");
 	if name == "DetailsPage":
 		inputdata = load_configdata(); set_configunits(); # Load data, store units
 		for key in Application.key_order:
-			if i>6:	i = 1; j = j+1; # Column limit exceeded, begin new row
+			if i>7:	i = 1; j = j+1; # Column limit exceeded, begin new row
 			labelName = tk.Label(self,font = NORMAL_FONT,text=key + ":"); labelName.grid(column=i, row=j);
 			fieldName = tk.Entry(self); fieldName.grid(column=i+2, row=j, rowspan=1);
 			fieldName.insert(1,inputdata[key]);	fieldName.configure(state="readonly");
 			if Application.units_set[key] != "None":
 				unitsLabel = tk.Label(self,font = NORMAL_FONT,text="("+Application.units_set[key]+")"); unitsLabel.grid(column=i+4, row=j);
+			sep = Separator(self, orient="vertical")
+			sep.grid(column=6, row=j-1, rowspan=2, sticky="nsew")
 			Application.DetailsPage_entries.append(fieldName); Application.DetailsPage_labels.append(labelName); # Store widgets 
-			i = i+5 # Column for Second label/entry pair
+			i = i+6 # Column for Second label/entry pair
 	else:
 		for key in Application.key_order:
-			if i>6: i = 1; j = j+1; # Column limit exceeded, begin new row
+			if i>7: i = 1; j = j+1; # Column limit exceeded, begin new row
 			labelName = tk.Label(self,font = NORMAL_FONT,text=key + ":"); labelName.grid(column=i, row=j);
 			fieldName = tk.Entry(self); fieldName.grid(column=i+2, row=j);
 			fieldName.insert(5,Application.configData[key]); # Create entry, add data
 			if Application.units_set[key] != "None":
 				unitsLabel = tk.Label(self,font = NORMAL_FONT,text="("+Application.units_set[key]+")"); unitsLabel.grid(column=i+4, row=j);
+			sep = Separator(self, orient="vertical")
+			sep.grid(column=6, row=j-1, rowspan=2, sticky="nsew")
 			Application.EditPage_entries.append(fieldName); Application.EditPage_labels.append(labelName); # Store widgets
-			i = i+5 # Column for Second label/entry pair
+			i = i+6 # Column for Second label/entry pair
 		Application.firstEdit = False # Config settings have been edited
 	pad_children(self) # Assign padding to child widgets
 
@@ -195,8 +200,8 @@ class DetailsPage(tk.Frame):
 	def set_page(self,controller):
 		inputdata = load_configdata()
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
-		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=11,rowspan=1)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
+		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 		display_ClassConfigs("DetailsPage",self)
 
 class EditConfigsPage(tk.Frame):
@@ -204,8 +209,8 @@ class EditConfigsPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=11,rowspan=1)
-		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
+		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
 		display_ClassConfigs("EditConfigsPage",self)
 
 class StatusCheckPage(tk.Frame):
