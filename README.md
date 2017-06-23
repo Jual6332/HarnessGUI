@@ -16,7 +16,7 @@ The following are needed to run the Harness GUI software
 
 ## Running the Code
 To run the code, clone this repo. Then, from inside the HarnessGUI directory: 
-```
+```python
 python3 main.py
 ```
 
@@ -29,5 +29,5 @@ python3 main.py
 - **Justin Alvey** - initial work, worked on during internship
 
 ## Acknowledgements
-- JP Chavez, OneWeb
-- Zach Meza, Oneweb
+- **JP Chavez**, OneWeb
+- **Zach Meza**, Oneweb
