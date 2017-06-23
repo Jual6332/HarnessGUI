@@ -15,7 +15,7 @@ class Application(tk.Tk):
 	EditPage_entries = []; EditPage_labels = []; # All editable widgets
 	errorLog = [] # Errors encountered by GUI
 	firstEdit = True # Edited check, to load changed data
-	labelsGone = False # Labels Deleted from DetailsPage
+	DetailsPage_labelsGone = False; EditPage_labelsGone = False; 
 	key_order = [] # Order of Dictionary Key Elements
 	script_name = "runzFile.sh"; # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
@@ -38,7 +38,7 @@ class Application(tk.Tk):
 	def show_frame(self, cont):
 		for frame in self.frames.values(): frame.grid_remove()
 		frame = self.frames[cont]
-		if cont.__name__ == "DetailsPage" and Application.labelsGone:
+		if cont.__name__ == "DetailsPage" and Application.DetailsPage_labelsGone:
 			del frame; frame = DetailsPage(self.container,self);
 			self.frames[DetailsPage] = frame
 		elif cont.__name__ == "StatusCheckPage": 
@@ -78,9 +78,6 @@ def window_asktocancel(pageName,controller,errorQuery):
 		if pageName == "Home": controller.show_frame(StartPage);
 		elif pageName == "Quit": close_app();
 
-def window_popup(title,message):
-   tk.messagebox.showinfo(title, message)
-
 def window_callwait(message,self):
     win = window_loadwait(message,self); self.after(2000, win.destroy);
 
@@ -88,6 +85,9 @@ def window_loadwait(message,self):
 	win = tk.Toplevel(self); win.transient(); win.title("");
 	label = tk.Label(win, font = NORMAL_FONT, text=message); label.grid(row=0, column=0,columnspan=3); label.grid_configure(padx=10, pady=10);
 	return win
+
+def window_popup(title,message):
+   tk.messagebox.showinfo(title, message)
 
 # Config Data Functions
 def load_configdata():
@@ -109,10 +109,10 @@ def load_configdata():
 	return inputdata
 
 def remove_configitems():
-	if (not Application.labelsGone):
+	if (not Application.DetailsPage_labelsGone):
 		for label in Application.DetailsPage_labels: label.grid_remove(); label.destroy();
 		for entry in Application.DetailsPage_entries: entry.grid_remove(); entry.destroy();
-		Application.labelsGone = True
+		Application.DetailsPage_labelsGone = True
 
 def save_configdata(self,controller): # Gather Entry Data, if changed then Output new values
 	num=0; check = True; errorMsg = "Errors:\n------------\n";
