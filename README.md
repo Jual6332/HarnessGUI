@@ -15,11 +15,10 @@ The following are needed to run the Harness GUI software
 - Configuration settings loaded automatically
 
 ## Running the Code
-Clone this repo. Then, from inside the HarnessGUI directory: 
+To run the code, clone this repo. Then, from inside the HarnessGUI directory: 
 ```
 python3 main.py
 ```
-will run the program
 
 ## What's Ahead
 - Integrate GUI w/ Harness for testing
