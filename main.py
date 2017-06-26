@@ -205,7 +205,7 @@ class DetailsPage(tk.Frame):
 	def set_page(self,controller):
 		inputdata = load_configdata()
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
+		backbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
 		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 		display_ClassConfigs("DetailsPage",self)
 
@@ -224,6 +224,7 @@ class EditFileNamePage(tk.Frame):
 	def set_page(self,controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Change Config File Name\n").grid(row=0, column=1,columnspan=3)
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: controller.show_frame(StartPage)).grid(row=1,column=3,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(StartPage)).grid(row=1,column=4,rowspan=1)
 		labelName = tk.Label(self,font = NORMAL_FONT,text="Filename:"); labelName.grid(column=1, row=1);
 		fieldName = tk.Entry(self); fieldName.grid(column=2, row=1); fieldName.insert(5,Application.script_name); # Create entry, add data
 		pad_children(self) # Assign padding to child widgets
