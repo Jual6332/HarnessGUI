@@ -10,7 +10,7 @@ The following are needed to run the Harness GUI software
 
 ## Main Features
 - Error checks for shell scripts on the Status Check window
-- Java Program for Harness is run from GUI (via shell)
+- Java Project for Harness is run from GUI (via shell)
 - Configuration settings editable for user
 - Configuration settings loaded automatically
 
@@ -26,7 +26,7 @@ python3 main.py
 - Make changes to UI as need be, document code for others
 
 ## Authors
-- **Justin Alvey** - initial work, worked on during internship
+- **Justin Alvey** - initial work, completed during internship
 
 ## Acknowledgements
 - **JP Chavez**, OneWeb
