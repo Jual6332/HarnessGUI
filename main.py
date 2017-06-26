@@ -17,7 +17,8 @@ class Application(tk.Tk):
 	firstEdit = True # Edited check, to load changed data
 	DetailsPage_labelsGone = False; EditPage_labelsGone = False; 
 	key_order = [] # Order of Dictionary Key Elements
-	script_name = "runzFile.sh"; # Script to run Harness java project
+	log_filename = "harness_log.txt" # Log file for Configuration settings
+	script_filename = "runFile.sh" # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
 	units = ["y/n","hrs","hrs","mins","hrs","hrs","hrs","None"]; units_set = {}; # Units for Configs
@@ -60,16 +61,22 @@ def pad_children(self):
 def runscript_callback(controller):
 	noerror = False; 
 	try:
-		subprocess.check_output('Scripts/Bash/'+Application.script_name,stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
+		subprocess.check_output('Scripts/Bash/'+Application.script_filename,stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
 		noerror = True
 	except subprocess.CalledProcessError as e:
 		noerror = False
-		if "not found" in e.output and "Scripts/Bash/" in e.output: e.output="Script file '" + Application.script_name+ "' not found";
+		if "not found" in e.output and "Scripts/Bash/" in e.output: e.output="Script file '" + Application.script_filename+ "' not found";
 		Application.errorLog.append(e.output); Application.StatusPage_checks["Harness Script Run"] = "FAIL";
 	if (noerror):
-		subprocess.call('Scripts/Bash/'+Application.script_name, shell=True) # Script accomplishes both Harness build &run 
+		subprocess.call('Scripts/Bash/'+Application.script_filename, shell=True) # Script accomplishes both Harness build &run 
 		Application.StatusPage_checks["Harness Script Run"] = "PASS"
 	controller.show_frame(StatusCheckPage)
+
+def save_filename(controller,field, field2):
+	fileName_log = field.get();	fileName_script = field2.get();
+	if fileName_log != Application.log_filename: Application.log_filename = fileName_log
+	if fileName_script != Application.script_filename: Application.script_filename = fileName_script
+	controller.show_frame(StartPage)
 
 def window_asktocancel(pageName,controller,errorQuery):
 	if not errorQuery:
@@ -222,11 +229,13 @@ class EditFileNamePage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
-		label = tk.Label(self, font = LARGE_FONT, text = "Change Config File Name\n").grid(row=0, column=1,columnspan=3)
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: controller.show_frame(StartPage)).grid(row=1,column=3,rowspan=1)
-		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(StartPage)).grid(row=1,column=4,rowspan=1)
-		labelName = tk.Label(self,font = NORMAL_FONT,text="Filename:"); labelName.grid(column=1, row=1);
-		fieldName = tk.Entry(self); fieldName.grid(column=2, row=1); fieldName.insert(5,Application.script_name); # Create entry, add data
+		labeltile = tk.Label(self, font = LARGE_FONT, text = "Change File Names\n").grid(row=0, column=1,columnspan=3)
+		labelName = tk.Label(self,font = NORMAL_FONT,text="Log Filename:"); labelName.grid(column=1, row=1);
+		fieldName = tk.Entry(self); fieldName.grid(column=2, row=1); fieldName.insert(5,"harness_log.txt"); # Create entry, add data
+		labelName2 = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName2.grid(column=1, row=2);
+		fieldName2 = tk.Entry(self); fieldName2.grid(column=2, row=2); fieldName2.insert(5,Application.script_filename); # Create entry, add data
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fieldName, fieldName2)).grid(row=3,column=3,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(StartPage)).grid(row=3,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
 class StatusCheckPage(tk.Frame):
