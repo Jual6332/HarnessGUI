@@ -41,6 +41,9 @@ class Application(tk.Tk):
 		if cont.__name__ == "DetailsPage" and Application.DetailsPage_labelsGone:
 			del frame; frame = DetailsPage(self.container,self);
 			self.frames[DetailsPage] = frame
+		elif cont.__name__ == "EditConfigsPage" and Application.EditPage_labelsGone:
+			del frame; frame = EditConfigsPage(self.container,self);
+			self.frames[EditConfigsPage] = frame
 		elif cont.__name__ == "StatusCheckPage": 
 			del frame; frame = StatusCheckPage(self.container,self);
 			self.frames[StatusCheckPage] = frame
@@ -79,15 +82,15 @@ def window_asktocancel(pageName,controller,errorQuery):
 		elif pageName == "Quit": close_app();
 
 def window_callwait(message,self):
-    win = window_loadwait(message,self); self.after(2000, win.destroy);
+	win = window_loadwait(message,self); self.after(2000, win.destroy);
 
 def window_loadwait(message,self):
-	win = tk.Toplevel(self); win.transient(); win.title("");
+	win = tk.Toplevel(self); win.title(""); win.transient(); 
 	label = tk.Label(win, font = NORMAL_FONT, text=message); label.grid(row=0, column=0,columnspan=3); label.grid_configure(padx=10, pady=10);
 	return win
 
 def window_popup(title,message):
-   tk.messagebox.showinfo(title, message)
+	tk.messagebox.showinfo(title, message)
 
 # Config Data Functions
 def load_configdata():
@@ -108,11 +111,15 @@ def load_configdata():
 				no_space = no_newline[0].split(" "); inputdata[splice[0]] = no_space[1];
 	return inputdata
 
-def remove_configitems():
-	if (not Application.DetailsPage_labelsGone):
+def remove_configitems(name):
+	if (name == "DetailsPage" and not Application.DetailsPage_labelsGone):
 		for label in Application.DetailsPage_labels: label.grid_remove(); label.destroy();
 		for entry in Application.DetailsPage_entries: entry.grid_remove(); entry.destroy();
 		Application.DetailsPage_labelsGone = True
+	if (name == "EditConfigsPage" and not Application.EditPage_labelsGone):
+		for label in Application.EditPage_labels: label.grid_remove(); label.destroy();
+		for entry in Application.EditPage_entries: entry.grid_remove(); entry.destroy();
+		Application.EditPage_labelsGone = True
 
 def save_configdata(self,controller): # Gather Entry Data, if changed then Output new values
 	num=0; check = True; errorMsg = "Errors:\n------------\n";
@@ -129,7 +136,7 @@ def save_configdata(self,controller): # Gather Entry Data, if changed then Outpu
 		num = num+1
 	if check: # Save changes to CIs
 		if (Application.changesMade):
-			write_configdata("Save"); remove_configitems(); window_callwait("Saving changes!",self); # Save data, clear DetailsPage, display Saved changed prompt
+			write_configdata("Save"); remove_configitems("DetailsPage"); window_callwait("Saving changes!",self); # Save data, clear DetailsPage, display Saved changed prompt
 		controller.show_frame(DetailsPage) # Returns to read-only config settings page
 	else: window_popup("Save Failed",errorMsg)
 
@@ -165,7 +172,7 @@ class StartPage(tk.Frame):
 
 def display_ClassConfigs(name,self):
 	i=1;j=2; # Column and row incrementers
-	sty = Style(self); sty.configure("TSeparator", background="blue");
+	sty = Style(self); sty.configure("TSeparator", background="black");
 	if name == "DetailsPage":
 		inputdata = load_configdata(); set_configunits(); # Load data, store units
 		for key in Application.key_order:
