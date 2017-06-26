@@ -20,16 +20,15 @@ class Application(tk.Tk):
 	script_name = "runzFile.sh"; # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
-	units = ["y/n","hrs","hrs","mins","hrs","hrs","hrs","None"] # Units for Configs
-	units_set = {}
+	units = ["y/n","hrs","hrs","mins","hrs","hrs","hrs","None"]; units_set = {}; # Units for Configs
 
 	def __init__(self,*args,**kwargs):
 		tk.Tk.__init__(self,*args,**kwargs); tk.Tk.wm_title(self,"Harness Interface");
 		self.container = tk.Frame(self); self.container.pack(side="top", fill="both", expand=True);
 		self.container.grid_rowconfigure(0,weight=1); self.container.grid_columnconfigure(0,weight=1);
 		self.frames = {}; self.gather_StatusPage_checks(); # Fill Status Page dictionary
-		for F in (StartPage, DetailsPage, EditConfigsPage, StatusCheckPage):
-			frame = F(self.container,self); self.frames[F] = frame; frame.grid(row=0, column=0, sticky="nsew") # Create, store, grid
+		for F in (StartPage, DetailsPage, EditConfigsPage, EditFileNamePage, StatusCheckPage):
+			frame = F(self.container,self); self.frames[F] = frame; frame.grid(row=0, column=0, sticky="nsew"); # Create, store, grid
 		self.show_frame(StartPage) # Show Home
 
 	def gather_StatusPage_checks(self):
@@ -122,15 +121,15 @@ def remove_configitems(name):
 		Application.EditPage_labelsGone = True
 
 def save_configdata(self,controller): # Gather Entry Data, if changed then Output new values
-	num=0; check = True; errorMsg = "Errors:\n------------\n";
+	num=0; check = True; errorMsg = "";
 	for key in Application.key_order:
 		Application.sortedData[key] = Application.EditPage_entries[num].get() # Each key changed, gets its new value
 		if key == "forecast" and (not Application.sortedData[key].isalpha()):
-			check = False; errorMsg = errorMsg + "- Item 'forecast' must contain only letters\n";
+			check = False; errorMsg = errorMsg + "Error - Item 'forecast' must contain only letters\n";
 		elif key == "forecast" and (Application.sortedData[key] not in {"no","yes"}):
-			check = False; errorMsg = errorMsg + "- Item '"+key+"' must be either yes or no\n";
+			check = False; errorMsg = errorMsg + "Error - Item '"+key+"' must be either yes or no\n";
 		elif key != "forecast" and (not Application.sortedData[key].isnumeric()):
-			check = False; errorMsg = errorMsg + "- Item '"+key+"' must contain only numbers\n";
+			check = False; errorMsg = errorMsg + "Error - Item '"+key+"' must contain only numbers\n";
 		else:
 			if Application.configData[key] != Application.sortedData[key]: Application.changesMade = True;
 		num = num+1
@@ -152,10 +151,8 @@ def write_configdata(method):
 	else:
 		config = open('Logs/out.txt', 'w'); check_dict = Application.sortedData;
 	for key in Application.key_order:
-		if num != Application.count: # Simplify newline!
-			config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
-		else:
-			config.write(key + ": " + check_dict[key]) 
+		if num != Application.count: config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
+		else: config.write(key + ": " + check_dict[key])
 		num = num+1
 	config.close()
 
@@ -167,7 +164,8 @@ class StartPage(tk.Frame):
 		label = tk.Label(self, font = LARGE_FONT, text = "Harness Interface\n").grid(row=0, column=1,columnspan=3)
 		runbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text = "Run Harness",command=lambda: runscript_callback(controller)).grid(row=5,column=0,rowspan=1)
 		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="View Configs",command=lambda: controller.show_frame(DetailsPage)).grid(row=4,column=0,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command = close_app).grid(row=5,column=4,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=close_app).grid(row=5,column=4,rowspan=1)
+		settingsButton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text ="...", command=lambda: controller.show_frame(EditFileNamePage)).grid(row=5,column=5,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
 def display_ClassConfigs(name,self):
@@ -219,6 +217,16 @@ class EditConfigsPage(tk.Frame):
 		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
 		display_ClassConfigs("EditConfigsPage",self)
+
+class EditFileNamePage(tk.Frame):
+	def __init__(self,parent,controller):
+		initialize_class(self,parent,controller)
+	def set_page(self,controller):
+		label = tk.Label(self, font = LARGE_FONT, text = "Change Config File Name\n").grid(row=0, column=1,columnspan=3)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: controller.show_frame(StartPage)).grid(row=1,column=3,rowspan=1)
+		labelName = tk.Label(self,font = NORMAL_FONT,text="Filename:"); labelName.grid(column=1, row=1);
+		fieldName = tk.Entry(self); fieldName.grid(column=2, row=1); fieldName.insert(5,Application.script_name); # Create entry, add data
+		pad_children(self) # Assign padding to child widgets
 
 class StatusCheckPage(tk.Frame):
 	def __init__(self,parent,controller):
