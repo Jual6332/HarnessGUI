@@ -253,8 +253,8 @@ class StatusCheckPage(tk.Frame):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
 		error = False; 
 		if len(Application.errorLog)>0: error=True;
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: window_asktocancel("Home",controller,error)).grid(row=6,column=4,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=lambda: window_asktocancel("Quit",controller,error)).grid(row=6,column=5,rowspan=1)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=4,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=lambda: close_app()).grid(row=6,column=5,rowspan=1)
 		self.load_progress(controller)
 	def load_progress(self, controller):
 		i=1;j=2; # Column and row incrementers
