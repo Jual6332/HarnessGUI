@@ -156,9 +156,7 @@ def write_configdata(method):
 		config = open('Logs/harness_log_backup.txt', 'w'); check_dict = Application.configData;
 	else:
 		config = open('Logs/out.txt', 'w'); check_dict = Application.sortedData;
-	print("Method: "+method)
 	for key in Application.key_order:
-		print("Num: "+str(num)+" num_configs "+str(Application.num_configs))
 		if num != Application.num_configs: config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
 		else: config.write(key + ": " + check_dict[key])
 		num = num+1
