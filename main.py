@@ -9,15 +9,15 @@ SMALL_FONT = "Helvetica 10"; NORMAL_FONT = "Helvetica 12"; LARGE_FONT = "Verdana
 # App
 class Application(tk.Tk):
 	changesMade = False # Boolean for saving config file
-	count=0 # Number of Config Key, Valued Pairs
 	configData={} # Dictionary of Original Config Items
 	DetailsPage_entries = []; DetailsPage_labels = []; # All read-only widgets
+	DetailsPage_labelsGone = False; EditPage_labelsGone = False; 
 	EditPage_entries = []; EditPage_labels = []; # All editable widgets
 	errorLog = [] # Errors encountered by GUI
 	firstEdit = True # Edited check, to load changed data
-	DetailsPage_labelsGone = False; EditPage_labelsGone = False; 
 	key_order = [] # Order of Dictionary Key Elements
 	log_filename = "harness_log.txt" # Log file for Configuration settings
+	num_configs=0 # Number of Config Key, Valued Pairs
 	script_filename = "runFile.sh" # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
@@ -105,7 +105,7 @@ def load_configdata():
 			Application.key_order = []; data = f.readlines();
 			for item in data:
 				splice = item.split(":"); no_newline = splice[1].split("\n"); no_space = no_newline[0].split(" ");
-				Application.configData[splice[0]] = no_space[1]; Application.count = Application.count+1;
+				Application.configData[splice[0]] = no_space[1]; Application.num_configs = Application.num_configs+1;
 				inputdata = Application.configData; Application.key_order.append(splice[0]);
 		write_configdata("Backup")
 	else: # If changes have been made, load output file
@@ -151,13 +151,15 @@ def set_configunits():
 		Application.units_set[key] = Application.units[i]; i=i+1;
 
 def write_configdata(method):
-	num = 1 # printing incrementally
+	num = 1 # Incrementer
 	if method == "Backup":
 		config = open('Logs/harness_log_backup.txt', 'w'); check_dict = Application.configData;
 	else:
 		config = open('Logs/out.txt', 'w'); check_dict = Application.sortedData;
+	print("Method: "+method)
 	for key in Application.key_order:
-		if num != Application.count: config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
+		print("Num: "+str(num)+" num_configs "+str(Application.num_configs))
+		if num != Application.num_configs: config.write(key + ": " + check_dict[key] + "\n") # Print w/ newline
 		else: config.write(key + ": " + check_dict[key])
 		num = num+1
 	config.close()
@@ -173,7 +175,7 @@ class StartPage(tk.Frame):
 		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=close_app).grid(row=5,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
-def display_ClassConfigs(name,self):
+def display_ClassConfigs(name,self,controller):
 	i=1;j=2; # Column and row incrementers
 	sty = Style(self); sty.configure("TSeparator", background="black");
 	if name == "DetailsPage":
@@ -189,6 +191,8 @@ def display_ClassConfigs(name,self):
 			sep.grid(column=6, row=j-1, rowspan=2, sticky="nsew")
 			Application.DetailsPage_entries.append(fieldName); Application.DetailsPage_labels.append(labelName); # Store widgets 
 			i = i+6 # Column for Second label/entry pair
+		backbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
+		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 	else:
 		for key in Application.key_order:
 			if i>7: i = 1; j = j+1; # Column limit exceeded, begin new row
@@ -208,11 +212,8 @@ class DetailsPage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
-		inputdata = load_configdata()
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		backbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
-		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
-		display_ClassConfigs("DetailsPage",self)
+		display_ClassConfigs("DetailsPage",self,controller)
 
 class EditConfigsPage(tk.Frame):
 	def __init__(self,parent,controller):
@@ -221,15 +222,13 @@ class EditConfigsPage(tk.Frame):
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
 		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
-		display_ClassConfigs("EditConfigsPage",self)
+		display_ClassConfigs("EditConfigsPage",self,controller)
 
 class EditFileNamePage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
 		labeltile = tk.Label(self, font = LARGE_FONT, text = "Change File Names\n").grid(row=0, column=1,columnspan=3)
-		#labelName = tk.Label(self,font = NORMAL_FONT,text="Log Filename:"); labelName.grid(column=1, row=1);
-		#fieldName = tk.Entry(self); fieldName.grid(column=2, row=1); fieldName.insert(5,Application.log_filename); # Create entry, add data
 		labelName2 = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName2.grid(column=1, row=1);
 		fieldName2 = tk.Entry(self); fieldName2.grid(column=2, row=1); fieldName2.insert(5,Application.script_filename); # Create entry, add data
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fieldName2)).grid(row=3,column=3,rowspan=1)
