@@ -1,7 +1,7 @@
 # HarnessGUI
 
 ## Project Summary
-Python GUI built in Tkinter for operating the Harness with ease. The Harness serves as the "gate-keeper" of the MPS, operating between MME and Pleniter. See MME Gitlab documentation for more info on the Harness set-up.
+Python GUI built in Tkinter for operating the Harness with ease. The Harness serves as the "gate-keeper" of the MPS, operating between MME and Pleniter. See **MME Gitlab documentation** for more info on the Harness set-up.
 
 ## Prerequisites
 The following are needed to run the Harness GUI software
