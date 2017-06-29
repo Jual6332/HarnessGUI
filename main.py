@@ -1,8 +1,8 @@
-import tkinter as tk
+import Tkinter as tk
 import math
 import subprocess
-from tkinter import messagebox
-from tkinter.ttk import Separator, Style
+import tkMessageBox
+from ttk import Separator, Style
 
 SMALL_FONT = "Helvetica 10"; NORMAL_FONT = "Helvetica 12"; LARGE_FONT = "Verdana 18";
 
@@ -95,7 +95,7 @@ def window_loadwait(message,self):
 	return win
 
 def window_popup(title,message):
-	tk.messagebox.showinfo(title, message)
+	tkMessageBox.showinfo(title, message)
 
 # Config Data Functions
 def load_configdata():
@@ -134,7 +134,7 @@ def save_configdata(self,controller): # Gather Entry Data, if changed then Outpu
 			check = False; errorMsg = errorMsg + "Error - Item 'forecast' must contain only letters\n";
 		elif key == "forecast" and (Application.sortedData[key] not in {"no","yes"}):
 			check = False; errorMsg = errorMsg + "Error - Item '"+key+"' must be either yes or no\n";
-		elif key != "forecast" and (not Application.sortedData[key].isnumeric()):
+		elif key != "forecast" and (not Application.sortedData[key].isdigit()):
 			check = False; errorMsg = errorMsg + "Error - Item '"+key+"' must contain only numbers\n";
 		else:
 			if Application.configData[key] != Application.sortedData[key]: Application.changesMade = True;
