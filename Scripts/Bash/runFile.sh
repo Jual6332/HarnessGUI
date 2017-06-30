@@ -1,13 +1,4 @@
 #!/bin/bash
 
-# Run Logger
-cd /opt/pleniter/logger
-gnome-terminal -x ./pleniter-logger.sh 
-
-# Run PlanServer
-cd /opt/pleniter/plan/planServer
-gnome-terminal -x ./planServer.sh
-
-# Run Harness Code
-cd /home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash
-gnome-terminal -x ./runMore.sh
+# Run Logger, PlanServer, Harness Code
+gnome-terminal --tab -e 'bash -c /opt/pleniter/logger/pleniter-logger.sh;bash' --tab -e 'bash -c /opt/pleniter/plan/planServer/planServer.sh;bash' --tab -e 'bash -c /home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/runMore.sh;bash' --tab -e 'bash -c /home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/POST.sh;bash'
