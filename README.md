@@ -5,24 +5,25 @@ Python GUI built in Tkinter for operating the Harness with ease. The Harness ser
 
 ## Prerequisites
 The following are needed to run the Harness GUI software
-- Python3 (3.3 or newer required, developed on 3.5.2)
+- Python2 (2.7.5 and above)
 - Tkinter library for GUI features
 
 ## Main Features
+- Harness is run from a single-click (logger, planner, compiled, run)
+- GUI Integrated w/ Harness
 - Error checks for shell scripts on the Status Check window
 - Java Project for Harness is run from GUI (via shell)
 - Configuration settings editable for user
-- Configuration settings loaded automatically
 
 ## Running the Code
-To run the code, clone this repo. Then, from inside the HarnessGUI directory: 
+To run the code, clone this repo onto Pleniter subnet. Then, from inside the HarnessGUI directory: 
 ```python
-python3 main.py
+python main.py
 ```
 
 ## What's Ahead
-- Integrate GUI w/ Harness for testing
-- Implement a more robust shell scripting in back-end
+- Implement more robust shell scripting in back-end
+- Improved error checks on the Status Check window (logger running, database polled, etc)
 - Make changes to UI as need be, document code for others
 
 ## Authors
