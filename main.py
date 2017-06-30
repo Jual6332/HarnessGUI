@@ -169,7 +169,7 @@ class StartPage(tk.Frame):
 	def set_page(self,controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Harness Interface\n").grid(row=0, column=1,columnspan=3)
 		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="GUI Settings",command=lambda: controller.show_frame(SettingsPage)).grid(row=4,column=0,rowspan=1)
-		runbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text = "Run Harness",command=lambda: runscript_callback(controller)).grid(row=5,column=0,rowspan=1)
+		runbutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text = "Run Harness",command=lambda: runscript_callback(controller)).grid(row=5,column=0,rowspan=1)
 		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=close_app).grid(row=5,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
@@ -218,7 +218,7 @@ class EditConfigsPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Configuration Settings\n").grid(row=0, column=1,columnspan=3)
-		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
+		savebutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="Save",command=lambda: save_configdata(self,controller)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(DetailsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
 		display_ClassConfigs("EditConfigsPage",self,controller)
 
@@ -229,7 +229,7 @@ class EditFileNamePage(tk.Frame):
 		labeltile = tk.Label(self, font = LARGE_FONT, text = "Change File Names\n").grid(row=0, column=1,columnspan=3)
 		labelName2 = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName2.grid(column=1, row=1);
 		fieldName2 = tk.Entry(self); fieldName2.grid(column=2, row=1); fieldName2.insert(5,Application.script_filename); # Create entry, add data
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fieldName2)).grid(row=3,column=3,rowspan=1)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fieldName2)).grid(row=3,column=3,rowspan=1)
 		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(StartPage)).grid(row=3,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
@@ -238,7 +238,7 @@ class SettingsPage(tk.Frame):
 		initialize_class(self,parent,controller)
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "GUI Settings\n").grid(row=0, column=1,columnspan=3)
-		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "green", font = NORMAL_FONT, text="View Configs",command=lambda: controller.show_frame(DetailsPage)).grid(row=4,column=0,rowspan=1)
+		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="View Configs",command=lambda: controller.show_frame(DetailsPage)).grid(row=4,column=0,rowspan=1)
 		settingsButton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text ="Change Script", command=lambda: controller.show_frame(EditFileNamePage)).grid(row=5,column=0,rowspan=1)
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=5,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
@@ -258,7 +258,7 @@ class StatusCheckPage(tk.Frame):
 		for key in sorted(Application.StatusPage_checks):
 			labelName = tk.Label(self,font = NORMAL_FONT,text= key + "  ").grid(column=i, row=j)
 			labelSecond = tk.Label(self, font = SMALL_FONT,text=Application.StatusPage_checks[key], fg = "white")
-			if Application.StatusPage_checks[key] == "PASS": labelSecond.configure(bg = "Green");
+			if Application.StatusPage_checks[key] == "PASS": labelSecond.configure(bg = "forest green");
 			else: 
 				labelSecond.configure(bg = "Red"); logbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 9", text ="See Log", command = lambda: window_popup("Error Log",Application.errorLog[0])).grid(row=4,column=4,rowspan=1)
 			labelSecond.grid(column=i+2, row=j)
