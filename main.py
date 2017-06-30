@@ -15,7 +15,7 @@ class Application(tk.Tk):
 	EditPage_entries = []; EditPage_labels = []; # All editable widgets
 	errorLog = [] # Errors encountered by GUI
 	firstEdit = True # Edited check, to load changed data
-	key_order = [] # Order of Dictionary Key Elements
+	key_order = [] # Order of Dictionary Key Elements 
 	log_filename = "harness_log.txt" # Log file for Configuration settings
 	num_configs=0 # Number of Config Key, Valued Pairs
 	script_filename = "runFile.sh" # Script to run Harness java project
@@ -189,7 +189,7 @@ def display_ClassConfigs(name,self,controller):
 			sep.grid(column=6, row=j-1, rowspan=2, sticky="nsew")
 			Application.DetailsPage_entries.append(fieldName); Application.DetailsPage_labels.append(labelName); # Store widgets 
 			i = i+6 # Column for Second label/entry pair
-		backbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
+		backbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Back",command=lambda: controller.show_frame(SettingsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=13,rowspan=1)
 		editbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text="Edit",command=lambda: controller.show_frame(EditConfigsPage)).grid(row=int(math.ceil(len(Application.key_order)/2))+2,column=12,rowspan=1)
 	else:
 		for key in Application.key_order:
@@ -230,7 +230,7 @@ class EditFileNamePage(tk.Frame):
 		labelName2 = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName2.grid(column=1, row=1);
 		fieldName2 = tk.Entry(self); fieldName2.grid(column=2, row=1); fieldName2.insert(5,Application.script_filename); # Create entry, add data
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fieldName2)).grid(row=3,column=3,rowspan=1)
-		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(StartPage)).grid(row=3,column=4,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(SettingsPage)).grid(row=3,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
 class SettingsPage(tk.Frame):
@@ -246,6 +246,11 @@ class SettingsPage(tk.Frame):
 class StatusCheckPage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
+		# Scrollbar - for future applications, would need to reconfigure the architecture of GUI self >> canvas >> frame >> add Scrollbar
+		#self.vsb = tk.Scrollbar(self, orient="vertical")
+		#self.canvas = tk.Canvas(self, bd=0, highlightthickness=0,yscrollcommand=self.vsb.set)
+		#self.canvas.grid(row=0,column=0,expand=TRUE)
+		#self.vsb.config(command=self.canvas.yview)
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
 		error = False; 
