@@ -3,6 +3,7 @@ import math
 import subprocess
 import tkMessageBox
 from ttk import Separator, Style
+from pathlib2 import Path
 
 SMALL_FONT = "Helvetica 10"; NORMAL_FONT = "Helvetica 12"; LARGE_FONT = "Verdana 18";
 
@@ -20,6 +21,7 @@ class Application(tk.Tk):
 	num_configs=0 # Number of Config Key, Valued Pairs
 	script_filename = "runFile.sh" # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
+	StatusChecks = ["Run Logger","Run planServer","Run Harness","Manual Testing Available"]
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
 	units = ["y/n","hrs","hrs","mins","hrs","hrs","hrs","None"]; units_set = {}; # Units for Configs
 
@@ -33,7 +35,7 @@ class Application(tk.Tk):
 		self.show_frame(StartPage) # Show Home
 
 	def gather_StatusPage_checks(self):
-		for I in ["Configuration Settings Loaded","Configuration Settings Set","Harness Script Run"]: Application.StatusPage_checks[I] = "PASS";
+		for I in Application.StatusChecks: Application.StatusPage_checks[I] = "PASS";
 
 	def show_frame(self, cont):
 		for frame in self.frames.values(): frame.grid_remove()
@@ -59,17 +61,20 @@ def pad_children(self):
 	for child in self.winfo_children(): child.grid_configure(padx=5, pady=5);
 
 def runscript_callback(controller):
-	noerror = False; 
-	try:
-		subprocess.check_output('Scripts/Bash/'+Application.script_filename,stderr=subprocess.STDOUT, shell=True, universal_newlines=True)
-		noerror = True
-	except subprocess.CalledProcessError as e:
-		noerror = False
-		if "not found" in e.output and "Scripts/Bash/" in e.output: e.output="Script file '" + Application.script_filename+ "' not found";
-		Application.errorLog.append(e.output); Application.StatusPage_checks["Harness Script Run"] = "FAIL";
-	if (noerror):
-		subprocess.call('Scripts/Bash/'+Application.script_filename, shell=True) # Script accomplishes both Harness build &run 
-		Application.StatusPage_checks["Harness Script Run"] = "PASS"
+	error = False; i=0;
+	for name in ["/opt/pleniter/logger/pleniter-logger.sh","/opt/pleniter/plan/planServer/planServer.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/runMore.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/POST.sh"]:
+		my_file = Path(name); msg = name + "Script Run";
+		if not my_file.is_file():
+			error = True
+			Application.errorLog.append("File not found: "+name); 
+			print("File Not Found:"+name)
+			Application.StatusPage_checks[Application.StatusChecks[i]] = "FAIL"
+		else:
+			error = False 
+			Application.StatusPage_checks[Application.StatusChecks[i]] = "PASS"
+		i = i+1
+	#if (not error):
+	#	subprocess.call('Scripts/Bash/'+Application.script_filename, shell=True) # Script accomplishes both Harness build &run 
 	controller.show_frame(StatusCheckPage)
 
 def save_filename(controller,field):
@@ -255,17 +260,19 @@ class StatusCheckPage(tk.Frame):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
 		error = False; 
 		if len(Application.errorLog)>0: error=True;
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=4,rowspan=1)
-		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=lambda: close_app()).grid(row=6,column=5,rowspan=1)
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=5,rowspan=1)
+		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=lambda: close_app()).grid(row=6,column=6,rowspan=1)
 		self.load_progress(controller)
 	def load_progress(self, controller):
-		i=1;j=2; # Column and row incrementers
-		for key in sorted(Application.StatusPage_checks):
+		el=0;i=1;j=2; # Column and row incrementers
+		for key in Application.StatusChecks:
 			labelName = tk.Label(self,font = NORMAL_FONT,text= key + "  ").grid(column=i, row=j)
 			labelSecond = tk.Label(self, font = SMALL_FONT,text=Application.StatusPage_checks[key], fg = "white")
 			if Application.StatusPage_checks[key] == "PASS": labelSecond.configure(bg = "forest green");
 			else: 
-				labelSecond.configure(bg = "Red"); logbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 9", text ="See Log", command = lambda: window_popup("Error Log",Application.errorLog[0])).grid(row=4,column=4,rowspan=1)
+				labelSecond.configure(bg = "Red");
+				logbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 9", text ="See Log", command = lambda: window_popup("Error Log",Application.errorLog[el])).grid(column=i+3,row=j,rowspan=1)
+				el = el+1;
 			labelSecond.grid(column=i+2, row=j)
 			j = j+1 # New row
 		pad_children(self) # Assign padding to child widgets

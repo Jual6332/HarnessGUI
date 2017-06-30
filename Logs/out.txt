@@ -1,7 +1,7 @@
 forecast: yes
 forecastMin: 13
-cshPeriod: 14
-cshLockout: 1
+cshPeriod: 1456
+cshLockout: 1500
 tpPeriod: 16
 visPeriod: 17
 statusPeriod: 18
