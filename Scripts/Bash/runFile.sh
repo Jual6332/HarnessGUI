@@ -1,9 +1,13 @@
 #!/bin/bash
-STR="Hello World! - from Bash"
-echo $STR
 
-# Testing new Java Codes
-javac Scripts/Java/HelloWorld.java
-java -cp Scripts/Java HelloWorld
-#mvn clean package
-#java -jar mpe-automate-jar-with-dependencies.jar
+# Run Logger
+cd /opt/pleniter/logger
+gnome-terminal -x ./pleniter-logger.sh 
+
+# Run PlanServer
+cd /opt/pleniter/plan/planServer
+gnome-terminal -x ./planServer.sh
+
+# Run Harness Code
+cd /home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash
+gnome-terminal -x ./runMore.sh
