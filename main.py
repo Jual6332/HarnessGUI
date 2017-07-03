@@ -19,9 +19,10 @@ class Application(tk.Tk):
 	key_order = [] # Order of Dictionary Key Elements 
 	log_filename = "harness_log.txt" # Log file for Configuration settings
 	num_configs=0 # Number of Config Key, Valued Pairs
+	paths = ["/opt/pleniter/logger/pleniter-logger.sh","/opt/pleniter/plan/planServer/planServer.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/runMore.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/POST.sh"]
 	script_filename = "runFile.sh" # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
-	StatusChecks = ["Run Logger","Run planServer","Run Harness","Manual Testing Available"]
+	StatusChecks = ["Run Logger","Run planServer","Run Harness","Start Planning Available"]
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
 	units = ["y/n","hrs","hrs","mins","hrs","hrs","hrs","None"]; units_set = {}; # Units for Configs
 
@@ -62,7 +63,7 @@ def pad_children(self):
 
 def runscript_callback(controller):
 	error = False; i=0;
-	for name in ["/opt/pleniter/logger/pleniter-logger.sh","/opt/pleniter/plan/planServer/planServer.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/runMore.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/POST.sh"]:
+	for name in Application.paths:
 		my_file = Path(name); #msg = name + "Script Run";
 		if not my_file.is_file():
 			error = True
@@ -76,10 +77,14 @@ def runscript_callback(controller):
 		subprocess.call('Scripts/Bash/'+Application.script_filename, shell=True) # Script accomplishes both Harness build &run 
 	controller.show_frame(StatusCheckPage)
 
-def save_filename(controller,field):
-	fileName_script = field.get();
-	if fileName_script != Application.script_filename: Application.script_filename = fileName_script
-	controller.show_frame(StartPage)
+def save_filename(controller,fields):
+	i = 0
+	for field in fields:
+		fileName_script = field.get();
+		if fileName_script != Application.paths[i]: 
+			Application.paths[i] = fileName_script
+		i=i+1
+	controller.show_frame(SettingsPage)
 
 def window_asktocancel(pageName,controller,errorQuery):
 	if not errorQuery:
@@ -230,11 +235,18 @@ class EditFileNamePage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
 	def set_page(self,controller):
-		labeltile = tk.Label(self, font = LARGE_FONT, text = "Change File Names\n").grid(row=0, column=1,columnspan=3)
-		labelName2 = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName2.grid(column=1, row=1);
-		fieldName2 = tk.Entry(self); fieldName2.grid(column=2, row=1); fieldName2.insert(5,Application.script_filename); # Create entry, add data
-		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fieldName2)).grid(row=3,column=3,rowspan=1)
-		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(SettingsPage)).grid(row=3,column=4,rowspan=1)
+		fields = []; row = 1
+		labeltile = tk.Label(self, font = LARGE_FONT, text = "Change Script Paths\n").grid(row=0, column=1,columnspan=3)
+		for key in ["Logger Path:","PlanServer Path:", "Harness Path:", "Planning Script Path"]:
+			labelName = tk.Label(self,font = NORMAL_FONT,text=key); labelName.grid(column=1, row=row);
+			fieldName = tk.Entry(self); fieldName.grid(column=2, row=row); fieldName.insert(5,Application.paths[row-1]); # Create entry, add data
+			fields.append(fieldName)
+			row = row+1
+		#labelName = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName.grid(column=1, row=2);
+		#fieldName = tk.Entry(self); fieldName.grid(column=2, row=2); fieldName.insert(5,Application.paths[1]); # Create entry, add data
+		#fields = [fieldName2, fieldName]
+		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fields)).grid(row=row,column=3,rowspan=1)
+		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(SettingsPage)).grid(row=row,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
 class SettingsPage(tk.Frame):
@@ -243,7 +255,7 @@ class SettingsPage(tk.Frame):
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "GUI Settings\n").grid(row=0, column=1,columnspan=3)
 		newpagebutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="View Configs",command=lambda: controller.show_frame(DetailsPage)).grid(row=4,column=0,rowspan=1)
-		settingsButton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text ="Change Script", command=lambda: controller.show_frame(EditFileNamePage)).grid(row=5,column=0,rowspan=1)
+		settingsButton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = NORMAL_FONT, text ="Change Paths", command=lambda: controller.show_frame(EditFileNamePage)).grid(row=5,column=0,rowspan=1)
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=5,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
 
