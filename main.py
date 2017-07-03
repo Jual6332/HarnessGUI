@@ -63,18 +63,17 @@ def pad_children(self):
 def runscript_callback(controller):
 	error = False; i=0;
 	for name in ["/opt/pleniter/logger/pleniter-logger.sh","/opt/pleniter/plan/planServer/planServer.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/runMore.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/POST.sh"]:
-		my_file = Path(name); msg = name + "Script Run";
+		my_file = Path(name); #msg = name + "Script Run";
 		if not my_file.is_file():
 			error = True
 			Application.errorLog.append("File not found: "+name); 
-			print("File Not Found:"+name)
 			Application.StatusPage_checks[Application.StatusChecks[i]] = "FAIL"
 		else:
 			error = False 
 			Application.StatusPage_checks[Application.StatusChecks[i]] = "PASS"
 		i = i+1
-	#if (not error):
-	#	subprocess.call('Scripts/Bash/'+Application.script_filename, shell=True) # Script accomplishes both Harness build &run 
+	if (not error):
+		subprocess.call('Scripts/Bash/'+Application.script_filename, shell=True) # Script accomplishes both Harness build &run 
 	controller.show_frame(StatusCheckPage)
 
 def save_filename(controller,field):
@@ -258,21 +257,21 @@ class StatusCheckPage(tk.Frame):
 		#self.vsb.config(command=self.canvas.yview)
 	def set_page(self, controller):
 		label = tk.Label(self, font = LARGE_FONT, text = "Status Check\n").grid(row=0, column=1,columnspan=3)
-		error = False; 
-		if len(Application.errorLog)>0: error=True;
+		error = False;
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "blue", font = NORMAL_FONT, text="Home",command=lambda: controller.show_frame(StartPage)).grid(row=6,column=5,rowspan=1)
 		exitButton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text ="Close", command=lambda: close_app()).grid(row=6,column=6,rowspan=1)
 		self.load_progress(controller)
 	def load_progress(self, controller):
-		el=0;i=1;j=2; # Column and row incrementers
+		numkeys=0;i=1;j=2; # Column and row incrementers
 		for key in Application.StatusChecks:
 			labelName = tk.Label(self,font = NORMAL_FONT,text= key + "  ").grid(column=i, row=j)
 			labelSecond = tk.Label(self, font = SMALL_FONT,text=Application.StatusPage_checks[key], fg = "white")
-			if Application.StatusPage_checks[key] == "PASS": labelSecond.configure(bg = "forest green");
-			else: 
+			if Application.StatusPage_checks[key] == "PASS": 
+				labelSecond.configure(bg = "forest green");
+			else:
 				labelSecond.configure(bg = "Red");
-				logbutton = tk.Button(self, bd = "2", fg = "white", bg = "gray", font = "Helvetica 9", text ="See Log", command = lambda: window_popup("Error Log",Application.errorLog[el])).grid(column=i+3,row=j,rowspan=1)
-				el = el+1;
+				logbutton = tk.Button(self, bd="2", fg="white", bg="gray", font="Helvetica 9", text="See Log", command=lambda: window_popup("Error Log","This file cannot be found!")).grid(column=i+3,row=j,rowspan=1)
+			numkeys = numkeys+1;
 			labelSecond.grid(column=i+2, row=j)
 			j = j+1 # New row
 		pad_children(self) # Assign padding to child widgets

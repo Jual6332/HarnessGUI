@@ -1,8 +1,8 @@
 forecast: yes
 forecastMin: 13
-cshPeriod: 1456
-cshLockout: 1500
+cshPeriod: 14
+cshLockout: 15
 tpPeriod: 16
 visPeriod: 17
 statusPeriod: 18
-maxAttempts: 19
+maxAttempts: 1900
