@@ -9,10 +9,9 @@ The following are needed to run the Harness GUI software
 - Tkinter library for GUI features
 
 ## Main Features
-- Harness is run from a single-click (logger, planner, compiled, run)
-- GUI Integrated w/ Harness
+- Harness is run from a single-click (logger, planning server, Harness compiled+run)
+- GUI Integrated w/ Harness (Server-side VM)
 - Error checks for shell scripts on the Status Check window
-- Java Project for Harness is run from GUI (via shell)
 - Configuration settings editable for user
 
 ## Running the Code
@@ -22,12 +21,14 @@ python main.py
 ```
 
 ## What's Ahead
+- Implement Start Planning option
+- Implement a more robust check-pointing scheme
 - Implement more robust shell scripting in back-end
-- Improved error checks on the Status Check window (logger running, database polled, etc)
-- Make changes to UI as need be, document code for others
+- Improve UI as need be, document code for others
+- Export to exe, stand-alone application for end user
 
 ## Authors
-- **Justin Alvey** - initial work, completed during internship
+- **Justin Alvey** - initial work, developed during internship
 
 ## Acknowledgements
 - **JP Chavez**, OneWeb
