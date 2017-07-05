@@ -22,7 +22,7 @@ class Application(tk.Tk):
 	paths = ["/opt/pleniter/logger/pleniter-logger.sh","/opt/pleniter/plan/planServer/planServer.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/runMore.sh","/home/pleniter/Documents/tests/justin_test/Harness_VM_Testing/Scripts/Bash/POST.sh"]
 	script_filename = "runFile.sh" # Script to run Harness java project
 	sortedData = {} # Dictionary of Config Items, saved by user
-	StatusChecks = ["Run Logger","Run planServer","Run Harness","Start Planning Available"]
+	StatusChecks = ["Logger is running","Planning server is running","Harness is running","Planning is available"]
 	StatusPage_checks = {} # Checks to make, labels for Status Check page
 	units = ["y/n","hrs","hrs","mins","hrs","hrs","hrs","None"]; units_set = {}; # Units for Configs
 
@@ -78,12 +78,10 @@ def runscript_callback(controller):
 	controller.show_frame(StatusCheckPage)
 
 def save_filename(controller,fields):
-	i = 0
-	for field in fields:
-		fileName_script = field.get();
-		if fileName_script != Application.paths[i]: 
+	for i in range(4):
+		fileName_script = fields[i].get();
+		if fileName_script != Application.paths[i]:
 			Application.paths[i] = fileName_script
-		i=i+1
 	controller.show_frame(SettingsPage)
 
 def window_asktocancel(pageName,controller,errorQuery):
@@ -242,9 +240,6 @@ class EditFileNamePage(tk.Frame):
 			fieldName = tk.Entry(self); fieldName.grid(column=2, row=row); fieldName.insert(5,Application.paths[row-1]); # Create entry, add data
 			fields.append(fieldName)
 			row = row+1
-		#labelName = tk.Label(self,font = NORMAL_FONT,text="Script Filename:"); labelName.grid(column=1, row=2);
-		#fieldName = tk.Entry(self); fieldName.grid(column=2, row=2); fieldName.insert(5,Application.paths[1]); # Create entry, add data
-		#fields = [fieldName2, fieldName]
 		gobackbutton = tk.Button(self, bd = "2", fg = "white", bg = "forest green", font = NORMAL_FONT, text="Save",command=lambda: save_filename(controller,fields)).grid(row=row,column=3,rowspan=1)
 		cancelbutton = tk.Button(self, bd = "2", fg = "white", bg = "red", font = NORMAL_FONT, text="Cancel",command=lambda: controller.show_frame(SettingsPage)).grid(row=row,column=4,rowspan=1)
 		pad_children(self) # Assign padding to child widgets
@@ -262,7 +257,7 @@ class SettingsPage(tk.Frame):
 class StatusCheckPage(tk.Frame):
 	def __init__(self,parent,controller):
 		initialize_class(self,parent,controller)
-		# Scrollbar - for future applications, would need to reconfigure the architecture of GUI self >> canvas >> frame >> add Scrollbar
+		# Scrollbar - for future applications, would need to reconfigure the architecture of GUI self >> canvas >> frame >> add Scrollbar from current self >> frame architecture 
 		#self.vsb = tk.Scrollbar(self, orient="vertical")
 		#self.canvas = tk.Canvas(self, bd=0, highlightthickness=0,yscrollcommand=self.vsb.set)
 		#self.canvas.grid(row=0,column=0,expand=TRUE)
