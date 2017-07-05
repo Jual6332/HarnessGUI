@@ -12,7 +12,6 @@ The following are needed to run the Harness GUI software
 - Harness is run from a single-click (logger, planner, compiled, run)
 - GUI Integrated w/ Harness
 - Error checks for shell scripts on the Status Check window
-- Java Project for Harness is run from GUI (via shell)
 - Configuration settings editable for user
 
 ## Running the Code
@@ -27,7 +26,7 @@ python main.py
 - Make changes to UI as need be, document code for others
 
 ## Authors
-- **Justin Alvey** - initial work, completed during internship
+- **Justin Alvey** - initial work, developed during internship
 
 ## Acknowledgements
 - **JP Chavez**, OneWeb
